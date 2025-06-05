@@ -10,10 +10,28 @@ st.set_page_config(page_title="Simulateur de Transmission Numérique", layout="w
 st.title("📡 Simulateur de Transmission Numérique")
 st.sidebar.header("Paramètres de Simulation")
 
-# Fonction utilitaire pour affichage horizontal des séquences
-def afficher_sequence(label, bits):
-    texte = " ".join([f"{i}:{bit}" for i, bit in enumerate(bits)])
-    st.write(f"**{label}** {texte}")
+def afficher_sequences_cote_a_cote(emis, recus):
+    lignes = []
+    max_len = max(len(emis), len(recus))
+    for i in range(max_len):
+        bit_emis = f"{i}:{emis[i]}" if i < len(emis) else ""
+        if i < len(recus):
+            erreur = "❌" if i < len(emis) and emis[i] != recus[i] else ""
+            bit_recus = f"{i}:{recus[i]}{erreur}"
+        else:
+            bit_recus = ""
+        lignes.append((bit_emis, bit_recus))
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**🔹 Séquence émise :**")
+        for bit_emis, _ in lignes:
+            st.text(bit_emis)
+    with col2:
+        st.markdown("**🔸 Séquence reçue :**")
+        for _, bit_recus in lignes:
+            st.text(bit_recus)
+
 
 try:
     # 🎯 Émetteur
