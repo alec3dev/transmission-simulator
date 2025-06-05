@@ -10,6 +10,10 @@ st.set_page_config(page_title="Simulateur de Transmission Numérique", layout="w
 st.title("📡 Simulateur de Transmission Numérique")
 st.sidebar.header("Paramètres de Simulation")
 
+def afficher_sequence(label, bits):
+    texte = " ".join([f"{i}:{bit}" for i, bit in enumerate(bits)])
+    st.write(f"**{label}** {texte}")
+
 try:
     with st.expander("🎯 Côté Émetteur", expanded=True):
         col1, col2 = st.columns(2)
@@ -47,14 +51,18 @@ try:
 
             st.subheader("Résultats de la Simulation")
             col1, col2 = st.columns(2)
-            with col1:
-                st.write("**Séquence émise:**", bits_emis)
-                st.write("**Séquence reçue:**", bits_recus)
-                erreurs = sum(b1 != b2 for b1, b2 in zip(bits_emis, bits_recus))
-                if erreurs == 0:
-                    st.success("✅ Transmission réussie sans erreurs!")
+             with col1:
+                afficher_sequence("🔹 Séquence émise :", bits_emis)
+                afficher_sequence("🔸 Séquence reçue :", bits_recus)
+        
+                nb_erreurs = sum(b1 != b2 for b1, b2 in zip(bits_emis, bits_recus))
+                if len(bits_recus) < len(bits_emis):
+                    st.warning("⚠️ Séquence reçue incomplète.")
+                elif nb_erreurs == 0:
+                    st.success("✅ Transmission réussie sans erreurs !")
                 else:
-                    st.error(f"❌ Erreurs de transmission ({erreurs} erreurs)")
+                    st.error(f"❌ Erreurs de transmission ({nb_erreurs} erreurs)")
+        
 
             with col2:
                 fig = plot_signals(bits_emis, signal_code, signal_filtre, signal_bruite,
