@@ -67,5 +67,5 @@ except Exception as e:
 
 st.markdown("""
 ---
-🔗 [Code source sur GitHub](https://github.com/votre-utilisateur/transmission-simulator)
+🔗 [Code source sur GitHub](https://github.com/alec3dev/transmission-simulator)
 """)
