@@ -76,8 +76,8 @@ try:
             col1, col2 = st.columns(2)
 
             with col1:
-                afficher_sequence("🔹 Séquence émise :", bits_emis)
-                afficher_sequence("🔸 Séquence reçue :", bits_recus)
+                afficher_sequences_cote_a_cote(bits_emis, bits_recus)
+
 
                 nb_erreurs = sum(b1 != b2 for b1, b2 in zip(bits_emis, bits_recus))
                 if len(bits_recus) < len(bits_emis):
