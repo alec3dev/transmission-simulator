@@ -10,11 +10,13 @@ st.set_page_config(page_title="Simulateur de Transmission Numérique", layout="w
 st.title("📡 Simulateur de Transmission Numérique")
 st.sidebar.header("Paramètres de Simulation")
 
+# Fonction utilitaire pour affichage horizontal des séquences
 def afficher_sequence(label, bits):
     texte = " ".join([f"{i}:{bit}" for i, bit in enumerate(bits)])
     st.write(f"**{label}** {texte}")
 
 try:
+    # 🎯 Émetteur
     with st.expander("🎯 Côté Émetteur", expanded=True):
         col1, col2 = st.columns(2)
         with col1:
@@ -27,9 +29,11 @@ try:
             code_ligne = st.selectbox("Type de codage en ligne", ["NRZ", "Manchester", "Miller", "RZ"])
             type_filtre_emission = st.selectbox("Filtre d'émission", ["Rectangulaire", "Cosinus surélevé", "Gaussien"])
 
+    # 🌐 Canal
     with st.expander("🌐 Canal de Propagation", expanded=True):
         snr_db = st.slider("Rapport Signal/Bruit (dB)", -10, 30, 10)
 
+    # 📥 Récepteur
     with st.expander("📥 Côté Récepteur", expanded=True):
         col1, col2 = st.columns(2)
         with col1:
@@ -39,6 +43,7 @@ try:
             methode_recup_horloge = st.selectbox("Méthode de récupération d'horloge", ["Boucle à verrouillage de phase", "Dérivation"])
             seuil_decision = st.slider("Seuil de décision", 0.0, 1.0, 0.5, 0.01)
 
+    # 🧪 Simulation
     if st.button("Lancer la Simulation"):
         try:
             signal_code = codage_ligne(bits_emis, code_ligne)
@@ -51,10 +56,11 @@ try:
 
             st.subheader("Résultats de la Simulation")
             col1, col2 = st.columns(2)
-             with col1:
+
+            with col1:
                 afficher_sequence("🔹 Séquence émise :", bits_emis)
                 afficher_sequence("🔸 Séquence reçue :", bits_recus)
-        
+
                 nb_erreurs = sum(b1 != b2 for b1, b2 in zip(bits_emis, bits_recus))
                 if len(bits_recus) < len(bits_emis):
                     st.warning("⚠️ Séquence reçue incomplète.")
@@ -62,17 +68,19 @@ try:
                     st.success("✅ Transmission réussie sans erreurs !")
                 else:
                     st.error(f"❌ Erreurs de transmission ({nb_erreurs} erreurs)")
-        
 
             with col2:
                 fig = plot_signals(bits_emis, signal_code, signal_filtre, signal_bruite,
                                    signal_demodule, signal_filtre_reception, bits_recus)
                 st.pyplot(fig)
+
         except Exception as e:
             st.error(f"Erreur pendant la simulation : {e}")
+
 except Exception as e:
     st.error(f"Erreur d'initialisation : {e}")
 
+# Pied de page
 st.markdown("""
 ---
 🔗 [Code source sur GitHub](https://github.com/alec3dev/transmission-simulator)
