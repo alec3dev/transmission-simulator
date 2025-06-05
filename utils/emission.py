@@ -24,4 +24,18 @@ def codage_ligne(bits, type_code):
         rz = []
         for bit in bits:
             rz.extend([bit, 0])
-        return np.repeat(rz
+        return np.repeat(rz, 5)
+    else:
+        raise ValueError(f"Codage non supporté : {type_code}")
+
+def filtre_emission(signal, type_filtre):
+    if type_filtre == "Rectangulaire":
+        return signal
+    elif type_filtre == "Cosinus surélevé":
+        return signal * np.hamming(len(signal))
+    elif type_filtre == "Gaussien":
+        gauss_filter = np.exp(-0.5 * ((np.arange(len(signal)) - len(signal)/2)/10)**2)
+        gauss_filter /= np.max(gauss_filter)
+        return signal * gauss_filter
+    else:
+        raise ValueError(f"Filtre d'émission non supporté : {type_filtre}")
