@@ -1,23 +1,32 @@
-
 import numpy as np
 
 def demodulation(signal, type_demod):
-    """Démodule le signal reçu"""
     if type_demod == "Cohérente":
-        return signal  # Simplification
-    # Implémenter d'autres méthodes...
+        return signal
+    elif type_demod == "Non cohérente":
+        return np.abs(signal)
+    else:
+        raise ValueError(f"Démodulation non supportée : {type_demod}")
 
 def filtre_reception(signal, type_filtre):
-    """Applique le filtre de réception"""
     if type_filtre == "Adapté":
-        return signal  # Simplification
-    # Implémenter d'autres filtres...
+        return signal
+    elif type_filtre == "Cosinus surélevé":
+        return signal * np.hamming(len(signal))
+    elif type_filtre == "Gaussien":
+        gauss_filter = np.exp(-0.5 * ((np.arange(len(signal)) - len(signal)/2)/10)**2)
+        gauss_filter /= np.max(gauss_filter)
+        return signal * gauss_filter
+    else:
+        raise ValueError(f"Filtre de réception non supporté : {type_filtre}")
 
 def recuperation_horloge(signal, methode):
-    """Récupère l'horloge à partir du signal"""
-    return np.arange(5, len(signal), 10)  # Simplification
+    if len(signal) < 10:
+        raise ValueError("Signal trop court pour récupération d'horloge.")
+    return np.arange(5, len(signal), 10)
 
 def decision(signal, horloge, seuil):
-    # Prendre le 1er échantillon de chaque bit Manchester
-    echantillons = signal[horloge[::2]]  # [::2] pour sauter la 2ème moitié
+    if max(horloge) >= len(signal):
+        raise IndexError("Horloge dépasse la taille du signal.")
+    echantillons = signal[horloge[::2]]
     return [1 if e > seuil else 0 for e in echantillons]
