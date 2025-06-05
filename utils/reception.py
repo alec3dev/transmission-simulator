@@ -18,6 +18,6 @@ def recuperation_horloge(signal, methode):
     return np.arange(5, len(signal), 10)  # Simplification
 
 def decision(signal, horloge, seuil):
-    """Prend la décision sur les bits reçus"""
-    echantillons = signal[horloge]
+    # Prendre le 1er échantillon de chaque bit Manchester
+    echantillons = signal[horloge[::2]]  # [::2] pour sauter la 2ème moitié
     return [1 if e > seuil else 0 for e in echantillons]
