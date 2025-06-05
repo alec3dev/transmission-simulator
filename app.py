@@ -32,4 +32,40 @@ try:
             type_demodulation = st.selectbox("Type de démodulation", ["Cohérente", "Non cohérente"])
             type_filtre_reception = st.selectbox("Filtre de réception", ["Adapté", "Cosinus surélevé", "Gaussien"])
         with col2:
-            methode_recup_horloge = st.sele
+            methode_recup_horloge = st.selectbox("Méthode de récupération d'horloge", ["Boucle à verrouillage de phase", "Dérivation"])
+            seuil_decision = st.slider("Seuil de décision", 0.0, 1.0, 0.5, 0.01)
+
+    if st.button("Lancer la Simulation"):
+        try:
+            signal_code = codage_ligne(bits_emis, code_ligne)
+            signal_filtre = filtre_emission(signal_code, type_filtre_emission)
+            signal_bruite = ajout_bruit(signal_filtre, snr_db)
+            signal_demodule = demodulation(signal_bruite, type_demodulation)
+            signal_filtre_reception = filtre_reception(signal_demodule, type_filtre_reception)
+            horloge = recuperation_horloge(signal_filtre_reception, methode_recup_horloge)
+            bits_recus = decision(signal_filtre_reception, horloge, seuil_decision)
+
+            st.subheader("Résultats de la Simulation")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write("**Séquence émise:**", bits_emis)
+                st.write("**Séquence reçue:**", bits_recus)
+                erreurs = sum(b1 != b2 for b1, b2 in zip(bits_emis, bits_recus))
+                if erreurs == 0:
+                    st.success("✅ Transmission réussie sans erreurs!")
+                else:
+                    st.error(f"❌ Erreurs de transmission ({erreurs} erreurs)")
+
+            with col2:
+                fig = plot_signals(bits_emis, signal_code, signal_filtre, signal_bruite,
+                                   signal_demodule, signal_filtre_reception, bits_recus)
+                st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Erreur pendant la simulation : {e}")
+except Exception as e:
+    st.error(f"Erreur d'initialisation : {e}")
+
+st.markdown("""
+---
+🔗 [Code source sur GitHub](https://github.com/votre-utilisateur/transmission-simulator)
+""")
